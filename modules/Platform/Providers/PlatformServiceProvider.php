@@ -7,9 +7,11 @@ namespace Modules\Platform\Providers;
 use App\Support\BaseModuleServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Modules\Platform\Actions\ActivateCompanyModulesAction;
+use Modules\Platform\Actions\UpdateCompanySettingsAction;
 use Modules\Platform\Events\CompanyRegistered;
 use Modules\Platform\Listeners\InitializeTenantPlatformDefaults;
 use Modules\Platform\Services\PaymentGatewayResolver;
+use Modules\Platform\Services\TenantModuleCatalogService;
 use Modules\Platform\Services\WalletLedgerService;
 
 /**
@@ -32,7 +34,9 @@ class PlatformServiceProvider extends BaseModuleServiceProvider
     {
         $this->app->singleton(PaymentGatewayResolver::class);
         $this->app->singleton(WalletLedgerService::class);
+        $this->app->singleton(TenantModuleCatalogService::class);
         $this->app->singleton(ActivateCompanyModulesAction::class);
+        $this->app->singleton(UpdateCompanySettingsAction::class);
     }
 
     /**

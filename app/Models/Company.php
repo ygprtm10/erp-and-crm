@@ -11,6 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Core\Models\Branch;
+use Modules\Core\Models\Category;
+use Modules\Core\Models\Contact;
+use Modules\Core\Models\InventoryStock;
+use Modules\Core\Models\Product;
+use Modules\Core\Models\Voucher;
 use Modules\Platform\Database\Factories\CompanyFactory;
 use Modules\Platform\Enums\CompanyModuleStatus;
 use Modules\Platform\Models\CompanyModule;
@@ -134,6 +140,54 @@ class Company extends Model implements HasName
     public function withdrawals(): HasMany
     {
         return $this->hasMany(SaasWithdrawal::class);
+    }
+
+    /**
+     * Define operational branches belonging to this company.
+     */
+    public function branches(): HasMany
+    {
+        return $this->hasMany(Branch::class);
+    }
+
+    /**
+     * Define CRM contacts belonging to this company.
+     */
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contact::class);
+    }
+
+    /**
+     * Define catalog categories belonging to this company.
+     */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    /**
+     * Define catalog products belonging to this company.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Define promotional vouchers belonging to this company.
+     */
+    public function vouchers(): HasMany
+    {
+        return $this->hasMany(Voucher::class);
+    }
+
+    /**
+     * Define branch inventory stock balances belonging to this company.
+     */
+    public function inventoryStocks(): HasMany
+    {
+        return $this->hasMany(InventoryStock::class);
     }
 
     /**

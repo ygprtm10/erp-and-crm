@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Core\Database\Seeders\CoreDemoSeeder;
 use Modules\Platform\Database\Seeders\SaasBundleSeeder;
 use Modules\Platform\Database\Seeders\SaasModuleSeeder;
 use Modules\Platform\Database\Seeders\SuperAdminSeeder;
@@ -27,9 +28,12 @@ class DatabaseSeeder extends Seeder
             SaasBundleSeeder::class,
         ]);
 
-        /** Seed demo multi-tenant accounts strictly in local and automated testing environments. */
+        /** Seed demo multi-tenant accounts and Core sample data strictly in local/testing environments. */
         if (app()->environment(['local', 'testing'])) {
-            $this->call(TenantDemoSeeder::class);
+            $this->call([
+                TenantDemoSeeder::class,
+                CoreDemoSeeder::class,
+            ]);
         }
     }
 }
