@@ -30,6 +30,10 @@ use Modules\Hris\Models\Position;
 use Modules\Hris\Models\WorkShift;
 use Modules\Iot\Models\IotAttendanceLog;
 use Modules\Iot\Models\IotDevice;
+use Modules\Kpi\Models\KpiBonusTier;
+use Modules\Kpi\Models\KpiEvaluation;
+use Modules\Kpi\Models\KpiIndicator;
+use Modules\Kpi\Models\KpiPeriod;
 use Modules\Platform\Database\Factories\CompanyFactory;
 use Modules\Platform\Enums\CompanyModuleStatus;
 use Modules\Platform\Models\CompanyModule;
@@ -332,6 +336,38 @@ class Company extends Model implements HasName
     public function iotAttendanceLogs(): HasMany
     {
         return $this->hasMany(IotAttendanceLog::class);
+    }
+
+    /**
+     * Define KPI indicator definitions belonging to this company.
+     */
+    public function kpiIndicators(): HasMany
+    {
+        return $this->hasMany(KpiIndicator::class);
+    }
+
+    /**
+     * Define KPI evaluation periods belonging to this company.
+     */
+    public function kpiPeriods(): HasMany
+    {
+        return $this->hasMany(KpiPeriod::class);
+    }
+
+    /**
+     * Define KPI bonus tiers belonging to this company.
+     */
+    public function kpiBonusTiers(): HasMany
+    {
+        return $this->hasMany(KpiBonusTier::class);
+    }
+
+    /**
+     * Define employee KPI evaluations belonging to this company.
+     */
+    public function kpiEvaluations(): HasMany
+    {
+        return $this->hasMany(KpiEvaluation::class);
     }
 
     /**

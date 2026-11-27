@@ -10,6 +10,7 @@ use Modules\Core\Database\Seeders\CoreDemoSeeder;
 use Modules\Hris\Database\Seeders\HrisDemoSeeder;
 use Modules\Hris\Database\Seeders\TaxMasterSeeder;
 use Modules\Iot\Database\Seeders\IotDemoSeeder;
+use Modules\Kpi\Database\Seeders\KpiDemoSeeder;
 use Modules\Platform\Database\Seeders\SaasBundleSeeder;
 use Modules\Platform\Database\Seeders\SaasModuleSeeder;
 use Modules\Platform\Database\Seeders\SuperAdminSeeder;
@@ -43,6 +44,7 @@ class DatabaseSeeder extends Seeder
                 TransactionDemoSeeder::class,
                 HrisDemoSeeder::class,
                 IotDemoSeeder::class,
+                KpiDemoSeeder::class,
             ]);
         }
     }

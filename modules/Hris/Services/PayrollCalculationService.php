@@ -24,6 +24,8 @@ use Modules\Hris\Models\Employee;
 use Modules\Hris\Models\PayrollRun;
 use Modules\Hris\Models\Payslip;
 use Modules\Hris\Models\PayslipItem;
+use Modules\Kpi\Enums\KpiEvaluationStatus;
+use Modules\Kpi\Models\KpiEvaluation;
 use Modules\Platform\Models\CompanySetting;
 
 /**
@@ -149,9 +151,17 @@ class PayrollCalculationService
                 $overtimePay = isset($adjustments['overtime_pay'])
                     ? $this->normalizeNonNegativeMoney((string) $adjustments['overtime_pay'], 'overtime_pay')
                     : $this->calculateOvertimePay($baseSalary, $allowancesTotal, $attendanceSummary['overtime_minutes']);
-                $bonusTotal = isset($adjustments['bonus_total'])
+                $manualBonusTotal = isset($adjustments['bonus_total'])
                     ? $this->normalizeNonNegativeMoney((string) $adjustments['bonus_total'], 'bonus_total')
                     : '0.0000';
+                $eligibleKpiEvaluations = $this->resolveEligibleKpiEvaluations(
+                    company: $company,
+                    employee: $employee,
+                    periodMonth: $periodMonth,
+                    periodYear: $periodYear,
+                );
+                $kpiBonusTotal = $this->sumKpiBonusTotal($eligibleKpiEvaluations);
+                $bonusTotal = bcadd($manualBonusTotal, $kpiBonusTotal, self::MONEY_SCALE);
                 $otherDeductions = isset($adjustments['other_deductions'])
                     ? $this->normalizeNonNegativeMoney((string) $adjustments['other_deductions'], 'other_deductions')
                     : '0.0000';
@@ -215,7 +225,8 @@ class PayrollCalculationService
                     [PayslipItemType::Earning, 'BASE_SALARY', 'Gaji Pokok', $baseSalary],
                     [PayslipItemType::Earning, 'FIXED_ALLOWANCE', 'Tunjangan Tetap', $allowancesTotal],
                     [PayslipItemType::Earning, 'OVERTIME_PAY', 'Upah Lembur', $overtimePay],
-                    [PayslipItemType::Earning, 'BONUS', 'Bonus', $bonusTotal],
+                    [PayslipItemType::Earning, 'BONUS', 'Bonus', $manualBonusTotal],
+                    [PayslipItemType::Earning, 'KPI_BONUS', 'Bonus Performa KPI', $kpiBonusTotal],
                     [PayslipItemType::Deduction, 'PPH21', 'PPh 21 (TER)', $taxResult->pph21Amount],
                     [PayslipItemType::Deduction, 'BPJS_KES_EMP', 'BPJS Kesehatan (Karyawan)', $taxResult->bpjsKesehatanEmployee],
                     [PayslipItemType::Deduction, 'BPJS_TK_EMP', 'BPJS Ketenagakerjaan (Karyawan)', $taxResult->bpjsTkEmployee],
@@ -223,6 +234,8 @@ class PayrollCalculationService
                     [PayslipItemType::CompanyContribution, 'BPJS_KES_COMP', 'BPJS Kesehatan (Perusahaan)', $taxResult->bpjsKesehatanCompany],
                     [PayslipItemType::CompanyContribution, 'BPJS_TK_COMP', 'BPJS Ketenagakerjaan (Perusahaan)', $taxResult->bpjsTkCompany],
                 ]);
+
+                $this->markKpiEvaluationsApplied($eligibleKpiEvaluations, $payslip);
 
                 $totalGross = bcadd($totalGross, $grossSalary, self::MONEY_SCALE);
                 $totalOtherDeductions = bcadd($totalOtherDeductions, $otherDeductions, self::MONEY_SCALE);
@@ -410,6 +423,82 @@ class PayrollCalculationService
         }
 
         return $normalized;
+    }
+
+    /**
+     * Resolve approved or locked KPI evaluations eligible for payout in the given payroll period.
+     *
+     * @return \Illuminate\Support\Collection<int, KpiEvaluation>
+     */
+    private function resolveEligibleKpiEvaluations(
+        Company $company,
+        Employee $employee,
+        int $periodMonth,
+        int $periodYear,
+    ): \Illuminate\Support\Collection {
+        if (! $company->hasActiveModule('kpi')) {
+            return collect();
+        }
+
+        return KpiEvaluation::query()
+            ->withoutGlobalScope('company')
+            ->where('company_id', $company->getKey())
+            ->where('employee_id', $employee->getKey())
+            ->whereIn('status', [
+                KpiEvaluationStatus::Approved->value,
+                KpiEvaluationStatus::Locked->value,
+            ])
+            ->whereNull('bonus_applied_to_payslip_id')
+            ->whereHas('period', static function ($query) use ($company, $periodMonth, $periodYear): void {
+                $query->withoutGlobalScope('company')
+                    ->where('company_id', $company->getKey())
+                    ->where('payroll_period_month', $periodMonth)
+                    ->where('payroll_period_year', $periodYear);
+            })
+            ->lockForUpdate()
+            ->get()
+            ->filter(static fn (KpiEvaluation $evaluation): bool => bccomp(
+                (string) $evaluation->bonus_amount,
+                '0.0000',
+                self::MONEY_SCALE,
+            ) > 0)
+            ->values();
+    }
+
+    /**
+     * Sum monetary bonus amounts across eligible KPI evaluations using bcmath precision.
+     *
+     * @param  \Illuminate\Support\Collection<int, KpiEvaluation>  $evaluations
+     */
+    private function sumKpiBonusTotal(\Illuminate\Support\Collection $evaluations): string
+    {
+        $total = '0.0000';
+
+        foreach ($evaluations as $evaluation) {
+            $total = bcadd($total, (string) $evaluation->bonus_amount, self::MONEY_SCALE);
+        }
+
+        return $total;
+    }
+
+    /**
+     * Link paid-out KPI evaluations to the generated payslip and lock them against duplicate payouts.
+     *
+     * @param  \Illuminate\Support\Collection<int, KpiEvaluation>  $evaluations
+     */
+    private function markKpiEvaluationsApplied(\Illuminate\Support\Collection $evaluations, Payslip $payslip): void
+    {
+        foreach ($evaluations as $evaluation) {
+            $updates = [
+                'bonus_applied_to_payslip_id' => $payslip->getKey(),
+            ];
+
+            if ($evaluation->status !== KpiEvaluationStatus::Locked) {
+                $updates['status'] = KpiEvaluationStatus::Locked;
+            }
+
+            $evaluation->update($updates);
+        }
     }
 
     /**
