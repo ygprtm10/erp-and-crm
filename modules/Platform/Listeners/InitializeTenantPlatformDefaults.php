@@ -48,6 +48,10 @@ class InitializeTenantPlatformDefaults
                         'payment_gateway_mode' => PaymentGatewayMode::PlatformMidtrans,
                         'midtrans_is_production' => false,
                         'invoice_prefix' => 'INV-',
+                        'enable_pph21' => false,
+                        'enable_bpjs_kesehatan' => false,
+                        'enable_bpjs_ketenagakerjaan' => false,
+                        'bpjs_jkk_rate' => '0.0024',
                     ],
                 );
         });

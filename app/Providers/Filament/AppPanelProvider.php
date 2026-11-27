@@ -22,6 +22,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Accounting\Filament\AccountingPlugin;
 use Modules\Core\Filament\CorePlugin;
+use Modules\Hris\Filament\HrisPlugin;
 use Modules\Platform\Filament\PlatformTenantPlugin;
 use Modules\Transaction\Filament\TransactionPlugin;
 
@@ -68,6 +69,7 @@ class AppPanelProvider extends PanelProvider
                 CorePlugin::make(),
                 AccountingPlugin::make(),
                 TransactionPlugin::make(),
+                HrisPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

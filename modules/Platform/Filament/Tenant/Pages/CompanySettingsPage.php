@@ -79,6 +79,10 @@ class CompanySettingsPage extends Page
             'midtrans_merchant_id' => $settings->midtrans_merchant_id,
             'midtrans_server_key' => $settings->midtrans_server_key,
             'midtrans_client_key' => $settings->midtrans_client_key,
+            'enable_pph21' => $settings->enable_pph21,
+            'enable_bpjs_kesehatan' => $settings->enable_bpjs_kesehatan,
+            'enable_bpjs_ketenagakerjaan' => $settings->enable_bpjs_ketenagakerjaan,
+            'bpjs_jkk_rate' => $settings->bpjs_jkk_rate ?? '0.0024',
         ]);
     }
 
@@ -178,6 +182,27 @@ class CompanySettingsPage extends Page
                             ->columnSpanFull()
                             ->helperText('Stored encrypted at rest and used to verify tenant webhook signatures.'),
                     ]),
+
+                Section::make('Pengaturan Default Payroll (PPh 21 & BPJS)')
+                    ->description('Atur sakelar default pajak dan BPJS untuk proses Generate Payroll.')
+                    ->columns(2)
+                    ->visible(static fn (): bool => static::hasActiveHrisModule())
+                    ->schema([
+                        Toggle::make('enable_pph21')
+                            ->label('Aktifkan PPh 21 Default (TER)'),
+                        Toggle::make('enable_bpjs_kesehatan')
+                            ->label('Aktifkan BPJS Kesehatan Default'),
+                        Toggle::make('enable_bpjs_ketenagakerjaan')
+                            ->label('Aktifkan BPJS Ketenagakerjaan Default'),
+                        TextInput::make('bpjs_jkk_rate')
+                            ->label('Tarif Risiko JKK BPJS TK')
+                            ->numeric()
+                            ->required(static fn (): bool => static::hasActiveHrisModule())
+                            ->minValue(0)
+                            ->maxValue(1)
+                            ->step('0.0001')
+                            ->helperText('Contoh: 0.0024 untuk tingkat risiko sangat rendah (0.24%).'),
+                    ]),
             ]);
     }
 
@@ -207,6 +232,16 @@ class CompanySettingsPage extends Page
                 ->danger()
                 ->send();
         }
+    }
+
+    /**
+     * Determine whether the active tenant has an active subscription for the HRIS module.
+     */
+    private static function hasActiveHrisModule(): bool
+    {
+        $tenant = Filament::getTenant();
+
+        return $tenant instanceof Company && $tenant->hasActiveModule('hris');
     }
 
     /**

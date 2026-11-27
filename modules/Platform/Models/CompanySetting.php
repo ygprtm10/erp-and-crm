@@ -24,6 +24,10 @@ use Modules\Platform\Enums\PaymentGatewayMode;
  * @property string|null $midtrans_client_key
  * @property string|null $fonnte_token
  * @property string $invoice_prefix
+ * @property bool $enable_pph21
+ * @property bool $enable_bpjs_kesehatan
+ * @property bool $enable_bpjs_ketenagakerjaan
+ * @property string $bpjs_jkk_rate
  */
 class CompanySetting extends Model
 {
@@ -47,6 +51,10 @@ class CompanySetting extends Model
         'midtrans_client_key',
         'fonnte_token',
         'invoice_prefix',
+        'enable_pph21',
+        'enable_bpjs_kesehatan',
+        'enable_bpjs_ketenagakerjaan',
+        'bpjs_jkk_rate',
     ];
 
     /**
@@ -62,6 +70,10 @@ class CompanySetting extends Model
             'midtrans_is_production' => 'boolean',
             'midtrans_server_key' => 'encrypted',
             'fonnte_token' => 'encrypted',
+            'enable_pph21' => 'boolean',
+            'enable_bpjs_kesehatan' => 'boolean',
+            'enable_bpjs_ketenagakerjaan' => 'boolean',
+            'bpjs_jkk_rate' => 'decimal:4',
         ];
     }
 }

@@ -55,6 +55,7 @@ class PlatformSeedersTest extends TestCase
         $this->assertSame('0.0000', $tokoWallet->available_balance);
         $this->assertTrue($tokoMaju->hasActiveModule('pos'));
         $this->assertTrue($tokoMaju->hasActiveModule('accounting'));
+        $this->assertTrue($tokoMaju->hasActiveModule('hris'));
         $this->assertFalse($tokoMaju->hasActiveModule('membership'));
 
         $gymSehat = Company::query()->where('slug', 'gym-sehat')->firstOrFail();
@@ -65,6 +66,7 @@ class PlatformSeedersTest extends TestCase
         $this->assertSame('0.0000', $gymWallet->available_balance);
         $this->assertTrue($gymSehat->hasActiveModule('membership'));
         $this->assertFalse($gymSehat->hasActiveModule('pos'));
+        $this->assertFalse($gymSehat->hasActiveModule('hris'));
     }
 
     /**
@@ -83,7 +85,7 @@ class PlatformSeedersTest extends TestCase
         $this->assertSame(5, SaasBundle::query()->count());
         $this->assertSame(2, CompanySetting::query()->withoutGlobalScope('company')->count());
         $this->assertSame(2, SaasTenantWallet::query()->withoutGlobalScope('company')->count());
-        $this->assertSame(3, CompanyModule::query()->withoutGlobalScope('company')->count());
+        $this->assertSame(4, CompanyModule::query()->withoutGlobalScope('company')->count());
     }
 
     /**

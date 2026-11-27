@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Modules\Core\Models\Branch;
 use Modules\Core\Models\Contact;
+use Modules\Hris\Models\Employee;
 use Modules\Transaction\Enums\OrderChannel;
 use Modules\Transaction\Enums\OrderStatus;
 use Modules\Transaction\Enums\PaymentStatus;
@@ -128,6 +129,14 @@ class Order extends Model
     public function posTable(): BelongsTo
     {
         return $this->belongsTo(PosTable::class, 'pos_table_id');
+    }
+
+    /**
+     * Define the optional salesperson employee credited for this order.
+     */
+    public function salespersonEmployee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'salesperson_employee_id');
     }
 
     /**

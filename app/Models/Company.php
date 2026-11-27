@@ -20,6 +20,14 @@ use Modules\Core\Models\Contact;
 use Modules\Core\Models\InventoryStock;
 use Modules\Core\Models\Product;
 use Modules\Core\Models\Voucher;
+use Modules\Hris\Models\Attendance;
+use Modules\Hris\Models\Department;
+use Modules\Hris\Models\Employee;
+use Modules\Hris\Models\LeaveRequest;
+use Modules\Hris\Models\PayrollRun;
+use Modules\Hris\Models\Payslip;
+use Modules\Hris\Models\Position;
+use Modules\Hris\Models\WorkShift;
 use Modules\Platform\Database\Factories\CompanyFactory;
 use Modules\Platform\Enums\CompanyModuleStatus;
 use Modules\Platform\Models\CompanyModule;
@@ -242,6 +250,70 @@ class Company extends Model implements HasName
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Define HRIS departments belonging to this company.
+     */
+    public function departments(): HasMany
+    {
+        return $this->hasMany(Department::class);
+    }
+
+    /**
+     * Define HRIS job positions belonging to this company.
+     */
+    public function positions(): HasMany
+    {
+        return $this->hasMany(Position::class);
+    }
+
+    /**
+     * Define HRIS work shifts belonging to this company.
+     */
+    public function workShifts(): HasMany
+    {
+        return $this->hasMany(WorkShift::class);
+    }
+
+    /**
+     * Define HRIS employees belonging to this company.
+     */
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
+
+    /**
+     * Define HRIS attendance records belonging to this company.
+     */
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    /**
+     * Define HRIS leave requests belonging to this company.
+     */
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    /**
+     * Define HRIS monthly payroll runs belonging to this company.
+     */
+    public function payrollRuns(): HasMany
+    {
+        return $this->hasMany(PayrollRun::class);
+    }
+
+    /**
+     * Define HRIS employee payslips belonging to this company.
+     */
+    public function payslips(): HasMany
+    {
+        return $this->hasMany(Payslip::class);
     }
 
     /**

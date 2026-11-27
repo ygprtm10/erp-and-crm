@@ -7,6 +7,7 @@ use App\Providers\Filament\AdminPanelProvider;
 use App\Providers\Filament\AppPanelProvider;
 use Modules\Accounting\Providers\AccountingServiceProvider;
 use Modules\Core\Providers\CoreServiceProvider;
+use Modules\Hris\Providers\HrisServiceProvider;
 use Modules\Platform\Providers\PlatformServiceProvider;
 use Modules\Transaction\Providers\TransactionServiceProvider;
 
@@ -20,4 +21,7 @@ return [
     CoreServiceProvider::class,
     AccountingServiceProvider::class,
     TransactionServiceProvider::class,
+
+    /** Wave 2: HRIS, Payroll, and operational expansion modules. */
+    HrisServiceProvider::class,
 ];

@@ -15,6 +15,9 @@ use Modules\Core\Models\Branch;
 use Modules\Core\Models\Category;
 use Modules\Core\Models\Product;
 use Modules\Core\Models\ProductVariant;
+use Modules\Hris\Enums\EmploymentStatus;
+use Modules\Hris\Enums\PtkpStatus;
+use Modules\Hris\Models\Employee;
 use Modules\Transaction\Enums\OrderChannel;
 use Modules\Transaction\Services\OrderCreationService;
 use Modules\Transaction\Services\OrderStageService;
@@ -64,6 +67,16 @@ class OrderStageServiceTest extends TestCase
         ]);
 
         $actor = User::factory()->create();
+        $handler = Employee::query()->withoutGlobalScope('company')->create([
+            'company_id' => $company->getKey(),
+            'branch_id' => $branch->getKey(),
+            'employee_code' => 'EMP-LND-01',
+            'full_name' => 'Laundry Handler',
+            'ptkp_status' => PtkpStatus::Tk0,
+            'base_salary' => '4000000.0000',
+            'employment_status' => EmploymentStatus::Active,
+            'join_date' => '2026-01-01',
+        ]);
         $order = app(OrderCreationService::class)->createOrder(
             company: $company,
             branch: $branch,
@@ -72,10 +85,10 @@ class OrderStageServiceTest extends TestCase
         );
 
         $stageService = app(OrderStageService::class);
-        $stage = $stageService->startStage($order, 'Washing', 101, 'Cold wash', $actor);
+        $stage = $stageService->startStage($order, 'Washing', $handler->getKey(), 'Cold wash', $actor);
 
         $this->assertSame('Washing', $stage->stage_name);
-        $this->assertSame(101, $stage->handled_by_employee_id);
+        $this->assertSame($handler->getKey(), $stage->handled_by_employee_id);
         $this->assertNull($stage->completed_at);
 
         $completed = $stageService->completeStage($stage, 'Wash finished', $actor);

@@ -7,6 +7,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Accounting\Database\Seeders\AccountingDemoSeeder;
 use Modules\Core\Database\Seeders\CoreDemoSeeder;
+use Modules\Hris\Database\Seeders\HrisDemoSeeder;
+use Modules\Hris\Database\Seeders\TaxMasterSeeder;
 use Modules\Platform\Database\Seeders\SaasBundleSeeder;
 use Modules\Platform\Database\Seeders\SaasModuleSeeder;
 use Modules\Platform\Database\Seeders\SuperAdminSeeder;
@@ -23,20 +25,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        /** Always seed core Super Admin and SaaS module/bundle catalogs across all environments. */
+        /** Always seed core Super Admin, SaaS catalogs, and global tax master tables across all environments. */
         $this->call([
             SuperAdminSeeder::class,
             SaasModuleSeeder::class,
             SaasBundleSeeder::class,
+            TaxMasterSeeder::class,
         ]);
 
-        /** Seed demo multi-tenant accounts and wave-1 sample data strictly in local/testing environments. */
+        /** Seed demo multi-tenant accounts and sample module data strictly in local/testing environments. */
         if (app()->environment(['local', 'testing'])) {
             $this->call([
                 TenantDemoSeeder::class,
                 CoreDemoSeeder::class,
                 AccountingDemoSeeder::class,
                 TransactionDemoSeeder::class,
+                HrisDemoSeeder::class,
             ]);
         }
     }

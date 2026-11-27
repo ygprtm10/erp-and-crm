@@ -8,6 +8,7 @@ use App\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Modules\Hris\Models\Employee;
 
 /**
  * Tracks service or laundry workflow execution stages for an order.
@@ -66,5 +67,13 @@ class OrderStage extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    /**
+     * Define the optional employee who handled this workflow stage.
+     */
+    public function handledByEmployee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'handled_by_employee_id');
     }
 }
