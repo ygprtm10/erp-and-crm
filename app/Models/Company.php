@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Accounting\Models\Account;
+use Modules\Accounting\Models\Expense;
+use Modules\Accounting\Models\Journal;
 use Modules\Core\Models\Branch;
 use Modules\Core\Models\Category;
 use Modules\Core\Models\Contact;
@@ -188,6 +191,30 @@ class Company extends Model implements HasName
     public function inventoryStocks(): HasMany
     {
         return $this->hasMany(InventoryStock::class);
+    }
+
+    /**
+     * Define Chart of Accounts entries belonging to this company.
+     */
+    public function accounts(): HasMany
+    {
+        return $this->hasMany(Account::class);
+    }
+
+    /**
+     * Define general ledger journals belonging to this company.
+     */
+    public function journals(): HasMany
+    {
+        return $this->hasMany(Journal::class);
+    }
+
+    /**
+     * Define operational expenses belonging to this company.
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
     }
 
     /**

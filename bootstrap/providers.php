@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Providers\AppServiceProvider;
 use App\Providers\Filament\AdminPanelProvider;
 use App\Providers\Filament\AppPanelProvider;
+use Modules\Accounting\Providers\AccountingServiceProvider;
 use Modules\Core\Providers\CoreServiceProvider;
 use Modules\Platform\Providers\PlatformServiceProvider;
 
@@ -16,4 +17,5 @@ return [
     /** Wave 1: Fundamental system modules. */
     PlatformServiceProvider::class,
     CoreServiceProvider::class,
+    AccountingServiceProvider::class,
 ];

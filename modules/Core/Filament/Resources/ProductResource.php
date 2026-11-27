@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Filament\Resources;
 
+use App\Models\Company;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,6 +23,8 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Accounting\Enums\AccountType;
+use Modules\Accounting\Models\Account;
 use Modules\Core\Enums\ProductType;
 use Modules\Core\Filament\Resources\ProductResource\Pages\CreateProduct;
 use Modules\Core\Filament\Resources\ProductResource\Pages\EditProduct;
@@ -95,7 +99,45 @@ class ProductResource extends Resource
                             ->nullable()
                             ->columnSpanFull(),
                     ]),
+                Section::make('Pemetaan Akun Akuntansi')
+                    ->description('Tautkan akun pendapatan, HPP, dan persediaan untuk penjurnalan otomatis.')
+                    ->columns(3)
+                    ->visible(static fn (): bool => Filament::getTenant() instanceof Company && Filament::getTenant()->hasActiveModule('accounting'))
+                    ->schema([
+                        Select::make('income_account_id')
+                            ->label('Income Account')
+                            ->nullable()
+                            ->searchable()
+                            ->options(static fn (): array => static::getTenantAccountOptions(AccountType::Revenue)),
+                        Select::make('cogs_account_id')
+                            ->label('COGS Account (HPP)')
+                            ->nullable()
+                            ->searchable()
+                            ->options(static fn (): array => static::getTenantAccountOptions(AccountType::Expense)),
+                        Select::make('inventory_account_id')
+                            ->label('Inventory Account')
+                            ->nullable()
+                            ->searchable()
+                            ->options(static fn (): array => static::getTenantAccountOptions(AccountType::Asset)),
+                    ]),
             ]);
+    }
+
+    /**
+     * Resolve tenant-scoped Chart of Accounts select options for a given account type.
+     *
+     * @return array<int, string>
+     */
+    private static function getTenantAccountOptions(AccountType $type): array
+    {
+        return Account::query()
+            ->where('type', $type->value)
+            ->orderBy('code')
+            ->get()
+            ->mapWithKeys(static fn (Account $account): array => [
+                $account->getKey() => "{$account->code} - {$account->name}",
+            ])
+            ->all();
     }
 
     /**

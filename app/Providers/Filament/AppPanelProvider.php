@@ -20,6 +20,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Modules\Accounting\Filament\AccountingPlugin;
 use Modules\Core\Filament\CorePlugin;
 use Modules\Platform\Filament\PlatformTenantPlugin;
 
@@ -42,6 +43,7 @@ class AppPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->viteTheme('resources/css/filament/app/theme.css')
             ->discoverResources(
                 in: app_path('Filament/App/Resources'),
                 for: 'App\\Filament\\App\\Resources',
@@ -63,6 +65,7 @@ class AppPanelProvider extends PanelProvider
             ->plugins([
                 PlatformTenantPlugin::make(),
                 CorePlugin::make(),
+                AccountingPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,
