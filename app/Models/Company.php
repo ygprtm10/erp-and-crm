@@ -28,6 +28,8 @@ use Modules\Hris\Models\PayrollRun;
 use Modules\Hris\Models\Payslip;
 use Modules\Hris\Models\Position;
 use Modules\Hris\Models\WorkShift;
+use Modules\Iot\Models\IotAttendanceLog;
+use Modules\Iot\Models\IotDevice;
 use Modules\Platform\Database\Factories\CompanyFactory;
 use Modules\Platform\Enums\CompanyModuleStatus;
 use Modules\Platform\Models\CompanyModule;
@@ -314,6 +316,22 @@ class Company extends Model implements HasName
     public function payslips(): HasMany
     {
         return $this->hasMany(Payslip::class);
+    }
+
+    /**
+     * Define IoT ESP32 devices belonging to this company.
+     */
+    public function iotDevices(): HasMany
+    {
+        return $this->hasMany(IotDevice::class);
+    }
+
+    /**
+     * Define IoT attendance scan logs belonging to this company.
+     */
+    public function iotAttendanceLogs(): HasMany
+    {
+        return $this->hasMany(IotAttendanceLog::class);
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Modules\Core\Models\Branch;
 use Modules\Hris\Enums\AttendanceSource;
 use Modules\Hris\Enums\AttendanceStatus;
+use Modules\Iot\Models\IotDevice;
 
 /**
  * Daily attendance record capturing clock-in/out timestamps, lateness, overtime, and capture source.
@@ -102,5 +103,13 @@ class Attendance extends Model
     public function workShift(): BelongsTo
     {
         return $this->belongsTo(WorkShift::class, 'work_shift_id');
+    }
+
+    /**
+     * Define the optional ESP32 IoT device that captured this attendance record.
+     */
+    public function iotDevice(): BelongsTo
+    {
+        return $this->belongsTo(IotDevice::class, 'iot_device_id');
     }
 }

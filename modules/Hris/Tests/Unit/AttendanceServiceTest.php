@@ -16,6 +16,9 @@ use Modules\Hris\Enums\PtkpStatus;
 use Modules\Hris\Models\Employee;
 use Modules\Hris\Models\WorkShift;
 use Modules\Hris\Services\AttendanceService;
+use Modules\Iot\Enums\IotDeviceStatus;
+use Modules\Iot\Enums\IotDeviceType;
+use Modules\Iot\Models\IotDevice;
 use Tests\TestCase;
 
 /**
@@ -54,8 +57,19 @@ class AttendanceServiceTest extends TestCase
      */
     public function test_late_clock_in_and_overtime_clock_out_via_iot_esp32_source(): void
     {
-        /** Arrange an employee assigned to 08:00-17:00 shift with 15-minute tolerance. */
+        /** Arrange an employee assigned to 08:00-17:00 shift with 15-minute tolerance and an IoT device. */
         [$company, $branch, $shift, $employee] = $this->createEmployeeFixture();
+        $iotDevice = IotDevice::query()->withoutGlobalScope('company')->create([
+            'company_id' => $company->getKey(),
+            'branch_id' => $branch->getKey(),
+            'device_code' => 'ESP32-TEST-77',
+            'name' => 'Test Terminal',
+            'device_type' => IotDeviceType::AttendanceRfid,
+            'api_token_hash' => hash('sha256', 'iot_test_token_77'),
+            'token_prefix' => 'iot_test_tok',
+            'status' => IotDeviceStatus::Active,
+            'cooldown_seconds' => 60,
+        ]);
         $service = app(AttendanceService::class);
 
         /** Act by clocking in 25 minutes late and clocking out 90 minutes past shift end via ESP32 source. */
@@ -63,21 +77,21 @@ class AttendanceServiceTest extends TestCase
             employee: $employee,
             clockInAt: '2026-04-11 08:25:00',
             source: AttendanceSource::IotEsp32,
-            iotDeviceId: 77,
+            iotDeviceId: $iotDevice->getKey(),
         );
 
         $clockOutAttendance = $service->recordClockOut(
             employee: $employee,
             clockOutAt: '2026-04-11 18:30:00',
             source: AttendanceSource::IotEsp32,
-            iotDeviceId: 77,
+            iotDeviceId: $iotDevice->getKey(),
         );
 
         /** Assert lateness, overtime, and nullable iot_device_id stored accurately. */
         $this->assertSame(AttendanceStatus::Late, $clockInAttendance->status);
         $this->assertSame(25, $clockInAttendance->late_minutes);
         $this->assertSame(90, $clockOutAttendance->overtime_minutes);
-        $this->assertSame(77, $clockOutAttendance->iot_device_id);
+        $this->assertSame($iotDevice->getKey(), $clockOutAttendance->iot_device_id);
         $this->assertSame(AttendanceSource::IotEsp32, $clockOutAttendance->source);
     }
 
