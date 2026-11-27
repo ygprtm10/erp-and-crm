@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\User;
@@ -8,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
+ * Factory for generating User test and seed records.
+ *
  * @extends Factory<User>
  */
 class UserFactory extends Factory
@@ -27,8 +31,10 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->e164PhoneNumber(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'is_super_admin' => false,
             'remember_token' => Str::random(10),
         ];
     }
@@ -38,8 +44,18 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user has global Super Admin privileges.
+     */
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'is_super_admin' => true,
         ]);
     }
 }
