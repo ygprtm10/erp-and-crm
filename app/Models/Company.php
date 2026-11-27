@@ -29,6 +29,9 @@ use Modules\Platform\Models\SaasSubscription;
 use Modules\Platform\Models\SaasTenantBankAccount;
 use Modules\Platform\Models\SaasTenantWallet;
 use Modules\Platform\Models\SaasWithdrawal;
+use Modules\Transaction\Models\Order;
+use Modules\Transaction\Models\PosShift;
+use Modules\Transaction\Models\PosTable;
 
 /**
  * Represents a tenant organization within the multi-tenant SaaS application.
@@ -215,6 +218,30 @@ class Company extends Model implements HasName
     public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class);
+    }
+
+    /**
+     * Define POS tables belonging to this company.
+     */
+    public function posTables(): HasMany
+    {
+        return $this->hasMany(PosTable::class);
+    }
+
+    /**
+     * Define cashier shifts belonging to this company.
+     */
+    public function posShifts(): HasMany
+    {
+        return $this->hasMany(PosShift::class);
+    }
+
+    /**
+     * Define unified transaction orders belonging to this company.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     /**

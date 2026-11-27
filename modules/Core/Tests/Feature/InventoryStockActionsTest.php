@@ -6,11 +6,11 @@ namespace Modules\Core\Tests\Feature;
 
 use App\Models\Company;
 use App\Models\User;
-use Database\Seeders\DatabaseSeeder;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Modules\Core\Database\Seeders\CoreDemoSeeder;
 use Modules\Core\Enums\StockMovementType;
 use Modules\Core\Filament\Resources\InventoryStockResource\Pages\ListInventoryStocks;
 use Modules\Core\Filament\Resources\InventoryStockResource\Pages\ViewInventoryStock;
@@ -19,6 +19,8 @@ use Modules\Core\Models\Branch;
 use Modules\Core\Models\InventoryStock;
 use Modules\Core\Models\ProductVariant;
 use Modules\Core\Models\StockMovement;
+use Modules\Platform\Database\Seeders\SaasModuleSeeder;
+use Modules\Platform\Database\Seeders\TenantDemoSeeder;
 use Tests\TestCase;
 
 /**
@@ -34,7 +36,11 @@ class InventoryStockActionsTest extends TestCase
     public function test_inventory_stock_actions_mutate_balances_and_record_audit_movements(): void
     {
         /** Arrange Toko Maju with main branch (50.00 stock) and a secondary branch. */
-        $this->seed(DatabaseSeeder::class);
+        $this->seed([
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+        ]);
 
         $owner1 = User::query()->where('email', 'owner@test.com')->firstOrFail();
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();
@@ -114,7 +120,11 @@ class InventoryStockActionsTest extends TestCase
     public function test_inventory_stock_actions_reject_overdraft_and_cross_tenant_branches(): void
     {
         /** Arrange Toko Maju stock (50.00) and Gym Sehat branch. */
-        $this->seed(DatabaseSeeder::class);
+        $this->seed([
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+        ]);
 
         $owner1 = User::query()->where('email', 'owner@test.com')->firstOrFail();
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();

@@ -6,11 +6,11 @@ namespace Modules\Accounting\Tests\Feature;
 
 use App\Models\Company;
 use App\Models\User;
-use Database\Seeders\DatabaseSeeder;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Modules\Accounting\Database\Seeders\AccountingDemoSeeder;
 use Modules\Accounting\Enums\ExpenseStatus;
 use Modules\Accounting\Enums\JournalStatus;
 use Modules\Accounting\Filament\Pages\FinancialReportPage;
@@ -25,6 +25,9 @@ use Modules\Accounting\Models\Expense;
 use Modules\Accounting\Models\Journal;
 use Modules\Accounting\Services\ExpenseService;
 use Modules\Accounting\Services\JournalPostingService;
+use Modules\Core\Database\Seeders\CoreDemoSeeder;
+use Modules\Platform\Database\Seeders\SaasModuleSeeder;
+use Modules\Platform\Database\Seeders\TenantDemoSeeder;
 use Tests\TestCase;
 
 /**
@@ -40,7 +43,12 @@ class AccountingWorkflowActionsTest extends TestCase
     public function test_account_resource_loads_standard_coa_and_blocks_system_account_deletion(): void
     {
         /** Arrange Toko Maju with accounting active. */
-        $this->seed(DatabaseSeeder::class);
+        $this->seed([
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+            AccountingDemoSeeder::class,
+        ]);
 
         $owner1 = User::query()->where('email', 'owner@test.com')->firstOrFail();
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();
@@ -66,7 +74,12 @@ class AccountingWorkflowActionsTest extends TestCase
     public function test_journal_resource_validates_repeater_balance_and_executes_post_and_void_actions(): void
     {
         /** Arrange Toko Maju accounts. */
-        $this->seed(DatabaseSeeder::class);
+        $this->seed([
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+            AccountingDemoSeeder::class,
+        ]);
 
         $owner1 = User::query()->where('email', 'owner@test.com')->firstOrFail();
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();
@@ -138,7 +151,12 @@ class AccountingWorkflowActionsTest extends TestCase
     public function test_expense_resource_mark_as_paid_action_settles_expense_and_posts_journal(): void
     {
         /** Arrange Toko Maju with one unpaid operational expense. */
-        $this->seed(DatabaseSeeder::class);
+        $this->seed([
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+            AccountingDemoSeeder::class,
+        ]);
 
         $owner1 = User::query()->where('email', 'owner@test.com')->firstOrFail();
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();
@@ -185,7 +203,12 @@ class AccountingWorkflowActionsTest extends TestCase
     public function test_financial_report_page_renders_trial_balance_and_profit_and_loss(): void
     {
         /** Arrange seeded Toko Maju with opening capital (25,000,000) and paid expense (500,000). */
-        $this->seed(DatabaseSeeder::class);
+        $this->seed([
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+            AccountingDemoSeeder::class,
+        ]);
 
         $owner1 = User::query()->where('email', 'owner@test.com')->firstOrFail();
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();

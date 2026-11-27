@@ -11,6 +11,7 @@ use Modules\Platform\Database\Seeders\SaasBundleSeeder;
 use Modules\Platform\Database\Seeders\SaasModuleSeeder;
 use Modules\Platform\Database\Seeders\SuperAdminSeeder;
 use Modules\Platform\Database\Seeders\TenantDemoSeeder;
+use Modules\Transaction\Database\Seeders\TransactionDemoSeeder;
 
 /**
  * Root database seeder orchestrating global Platform catalogs and local demo tenants.
@@ -35,6 +36,7 @@ class DatabaseSeeder extends Seeder
                 TenantDemoSeeder::class,
                 CoreDemoSeeder::class,
                 AccountingDemoSeeder::class,
+                TransactionDemoSeeder::class,
             ]);
         }
     }

@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Event;
 use Modules\Accounting\Actions\SeedDefaultAccountsAction;
 use Modules\Accounting\Events\ExpensePaid;
 use Modules\Accounting\Listeners\PostExpenseJournalListener;
+use Modules\Accounting\Listeners\PostOrderRevenueJournalListener;
 use Modules\Accounting\Listeners\PostWithdrawalJournalListener;
 use Modules\Accounting\Services\ExpenseService;
 use Modules\Accounting\Services\FinancialReportService;
 use Modules\Accounting\Services\JournalPostingService;
 use Modules\Platform\Events\WithdrawalCompleted;
+use Modules\Transaction\Events\OrderPaid;
 
 /**
  * Service provider for the Accounting double-entry bookkeeping domain module.
@@ -46,5 +48,6 @@ class AccountingServiceProvider extends BaseModuleServiceProvider
     {
         Event::listen(ExpensePaid::class, PostExpenseJournalListener::class);
         Event::listen(WithdrawalCompleted::class, PostWithdrawalJournalListener::class);
+        Event::listen(OrderPaid::class, PostOrderRevenueJournalListener::class);
     }
 }

@@ -23,6 +23,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Accounting\Filament\AccountingPlugin;
 use Modules\Core\Filament\CorePlugin;
 use Modules\Platform\Filament\PlatformTenantPlugin;
+use Modules\Transaction\Filament\TransactionPlugin;
 
 /**
  * Configures the multi-tenant Filament 5 application panel at /app/{company:slug}.
@@ -66,6 +67,7 @@ class AppPanelProvider extends PanelProvider
                 PlatformTenantPlugin::make(),
                 CorePlugin::make(),
                 AccountingPlugin::make(),
+                TransactionPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

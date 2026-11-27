@@ -8,6 +8,7 @@ use App\Providers\Filament\AppPanelProvider;
 use Modules\Accounting\Providers\AccountingServiceProvider;
 use Modules\Core\Providers\CoreServiceProvider;
 use Modules\Platform\Providers\PlatformServiceProvider;
+use Modules\Transaction\Providers\TransactionServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -18,4 +19,5 @@ return [
     PlatformServiceProvider::class,
     CoreServiceProvider::class,
     AccountingServiceProvider::class,
+    TransactionServiceProvider::class,
 ];

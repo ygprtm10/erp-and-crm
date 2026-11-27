@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace Modules\Accounting\Tests\Unit;
 
 use App\Models\Company;
-use Database\Seeders\DatabaseSeeder;
 use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Accounting\Actions\SeedDefaultAccountsAction;
+use Modules\Accounting\Database\Seeders\AccountingDemoSeeder;
 use Modules\Accounting\Enums\AccountType;
 use Modules\Accounting\Enums\NormalBalance;
 use Modules\Accounting\Models\Account;
 use Modules\Accounting\Models\Expense;
 use Modules\Accounting\Models\Journal;
 use Modules\Accounting\Services\JournalPostingService;
+use Modules\Core\Database\Seeders\CoreDemoSeeder;
 use Modules\Core\Models\Product;
+use Modules\Platform\Database\Seeders\SaasModuleSeeder;
+use Modules\Platform\Database\Seeders\TenantDemoSeeder;
 use Tests\TestCase;
 
 /**
@@ -97,9 +100,15 @@ class AccountIntegrityAndSeederTest extends TestCase
      */
     public function test_accounting_demo_seeder_is_idempotent_and_preserves_gym_sehat_module_gate(): void
     {
-        /** Act by running full DatabaseSeeder twice consecutively. */
-        $this->seed(DatabaseSeeder::class);
-        $this->seed(DatabaseSeeder::class);
+        /** Act by running Platform, Core, and Accounting seeders twice consecutively. */
+        $seeders = [
+            SaasModuleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+            AccountingDemoSeeder::class,
+        ];
+        $this->seed($seeders);
+        $this->seed($seeders);
 
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();
         $gymSehat = Company::query()->where('slug', 'gym-sehat')->firstOrFail();

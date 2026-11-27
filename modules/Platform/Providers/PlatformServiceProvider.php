@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Event;
 use Modules\Platform\Actions\ActivateCompanyModulesAction;
 use Modules\Platform\Actions\UpdateCompanySettingsAction;
 use Modules\Platform\Events\CompanyRegistered;
+use Modules\Platform\Listeners\CreditTenantWalletOnOrderPaidListener;
 use Modules\Platform\Listeners\InitializeTenantPlatformDefaults;
 use Modules\Platform\Services\PaymentGatewayResolver;
 use Modules\Platform\Services\TenantModuleCatalogService;
 use Modules\Platform\Services\WalletLedgerService;
+use Modules\Transaction\Events\OrderPaid;
 
 /**
  * Service provider for the Platform SaaS core domain module.
@@ -45,5 +47,6 @@ class PlatformServiceProvider extends BaseModuleServiceProvider
     protected function bootListeners(): void
     {
         Event::listen(CompanyRegistered::class, InitializeTenantPlatformDefaults::class);
+        Event::listen(OrderPaid::class, CreditTenantWalletOnOrderPaidListener::class);
     }
 }

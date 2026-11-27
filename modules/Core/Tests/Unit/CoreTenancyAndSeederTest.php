@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Modules\Core\Tests\Unit;
 
 use App\Models\Company;
-use Database\Seeders\DatabaseSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Core\Database\Seeders\CoreDemoSeeder;
 use Modules\Core\Models\Branch;
 use Modules\Core\Models\Category;
 use Modules\Core\Models\Contact;
@@ -16,6 +16,10 @@ use Modules\Core\Models\Product;
 use Modules\Core\Models\ProductVariant;
 use Modules\Core\Models\StockMovement;
 use Modules\Core\Models\Voucher;
+use Modules\Platform\Database\Seeders\SaasBundleSeeder;
+use Modules\Platform\Database\Seeders\SaasModuleSeeder;
+use Modules\Platform\Database\Seeders\SuperAdminSeeder;
+use Modules\Platform\Database\Seeders\TenantDemoSeeder;
 use Modules\Platform\Events\CompanyRegistered;
 use Tests\TestCase;
 
@@ -41,9 +45,16 @@ class CoreTenancyAndSeederTest extends TestCase
      */
     public function test_core_demo_seeder_is_idempotent_and_isolates_tenant_datasets(): void
     {
-        /** Act by running DatabaseSeeder twice consecutively. */
-        $this->seed(DatabaseSeeder::class);
-        $this->seed(DatabaseSeeder::class);
+        /** Act by running Platform and Core seeders twice consecutively. */
+        $seeders = [
+            SuperAdminSeeder::class,
+            SaasModuleSeeder::class,
+            SaasBundleSeeder::class,
+            TenantDemoSeeder::class,
+            CoreDemoSeeder::class,
+        ];
+        $this->seed($seeders);
+        $this->seed($seeders);
 
         $tokoMaju = Company::query()->where('slug', 'toko-maju')->firstOrFail();
         $gymSehat = Company::query()->where('slug', 'gym-sehat')->firstOrFail();
